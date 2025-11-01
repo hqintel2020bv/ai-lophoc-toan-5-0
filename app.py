@@ -25,8 +25,12 @@ menu = st.sidebar.radio("📌 Chọn chức năng:", [
     "📚 Tạo bài giảng",
     "📊 Bảng điểm",
     "🎒 Nộp bài học sinh",
+    "🧠 Tạo đề thi",
     "ℹ️ Giới thiệu"
 ])
+
+# Tên menu **không emoji** để so sánh cho Python
+menu_clean = menu.split(" ", 1)[1]
 
 # ----------------- FUNCTIONS -----------------
 def ai_grade(problem, answer):
@@ -42,7 +46,7 @@ Bài làm: {answer}
 """
     res = client.chat.completions.create(
         model="gpt-4.1-mini",
-        messages=[{"role":"user","content":prompt}]
+        messages=[{"role": "user", "content": prompt}]
     )
     return res.choices[0].message.content
 
@@ -82,89 +86,85 @@ Soạn bài giảng Toán chủ đề {topic} gồm:
     )
     return res.choices[0].message.content
 
-# ----------------- CHẤM TỰ LUẬN -----------------
-if menu == "✍️ Chấm tự luận":
-    st.subheader("Chấm bài tự luận")
+
+def tao_de_thi(chude):
+    prompt = f"""
+Tạo đề Toán THPT chủ đề: {chude}
+- 5 câu trắc nghiệm (kèm đáp án)
+- 2 câu tự luận (có hướng dẫn giải)
+- Định dạng rõ ràng, dễ đọc
+"""
+    resp = client.chat.completions.create(
+        model="gpt-4.1-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return resp.choices[0].message.content
+
+# ----------------- CHỨC NĂNG -----------------
+# Chấm tự luận
+if menu_clean == "Chấm tự luận":
+    st.subheader("✍️ Chấm bài tự luận")
     p = st.text_area("📌 Đề bài")
     a = st.text_area("📝 Bài làm học sinh")
     if st.button("✅ Chấm"):
-        st.write(ai_grade(p,a))
+        st.write(ai_grade(p, a))
 
-# ----------------- CHẤM TRẮC NGHIỆM -----------------
-elif menu == "🧮 Chấm trắc nghiệm":
+# Trắc nghiệm
+elif menu_clean == "Chấm trắc nghiệm":
     st.subheader("🧮 Chấm trắc nghiệm")
-
     correct = st.text_input("🔑 Đáp án đúng (VD: A,B,C,B,D...)")
     student = st.text_input("🎓 Đáp án học sinh")
-
     if st.button("✅ Chấm điểm"):
         correct_list = correct.split(",")
         stu_list = student.split(",")
-        score = sum([1 for i,j in zip(correct_list,stu_list) if i==j])
+        score = sum([1 for i, j in zip(correct_list, stu_list) if i == j])
         st.success(f"🎯 Điểm: {score}/{len(correct_list)}")
 
-# ----------------- OCR ẢNH -----------------
-elif menu == "🖼️ Chấm bài từ ảnh":
-    st.subheader("📸 Nhận diện bài làm từ ảnh")
-    img = st.file_uploader("Upload ảnh", type=["png","jpg","jpeg"])
+# Chấm từ ảnh
+elif menu_clean == "Chấm bài từ ảnh":
+    st.subheader("🖼️ Nhận diện bài làm từ ảnh")
+    img = st.file_uploader("Upload ảnh", type=["png", "jpg", "jpeg"])
     if img:
         im = Image.open(img)
         st.image(im)
-        text = pytesseract.image_to_string(im,lang="eng+vie")
+        text = pytesseract.image_to_string(im, lang="eng+vie")
         st.text_area("📄 OCR Text:", text)
         if st.button("✅ Chấm từ ảnh"):
             st.write(ai_grade("Bài trong ảnh", text))
 
-# ----------------- TẠO ĐỀ -----------------
-elif menu == "📝 Tạo đề kiểm tra":
+# Tạo đề kiểm tra
+elif menu_clean == "Tạo đề kiểm tra":
+    st.subheader("📝 Tạo đề kiểm tra")
     t = st.text_input("Chủ đề")
-    l = st.selectbox("Mức độ",["Nhận biết","Thông hiểu","Vận dụng","Vận dụng cao"])
-    n = st.slider("Số câu",5,30,10)
+    l = st.selectbox("Mức độ", ["Nhận biết", "Thông hiểu", "Vận dụng", "Vận dụng cao"])
+    n = st.slider("Số câu", 5, 30, 10)
     if st.button("🎯 Tạo đề"):
-        st.write(ai_generate_exam(t,l,n))
+        st.write(ai_generate_exam(t, l, n))
 
-# ----------------- BÀI GIẢNG -----------------
-elif menu == "📚 Tạo bài giảng":
+# Bài giảng
+elif menu_clean == "Tạo bài giảng":
+    st.subheader("📚 Tạo bài giảng")
     topic = st.text_input("Chủ đề bài giảng")
     if st.button("📘 Sinh bài giảng"):
         st.write(ai_lecture(topic))
 
-# ----------------- BẢNG ĐIỂM -----------------
-elif menu == "📊 Bảng điểm":
-    st.write("📊 Chức năng nâng cấp — phiên bản V3 sẽ lưu Cloud + download Excel")
+# Bảng điểm
+elif menu_clean == "Bảng điểm":
+    st.subheader("📊 Bảng điểm")
+    st.write("Chức năng cloud + export Excel sẽ có ở bản V3 ✅")
 
-# ----------------- FORM NỘP BÀI -----------------
-elif menu == "🎒 Nộp bài học sinh":
+# Nộp bài học sinh
+elif menu_clean == "Nộp bài học sinh":
+    st.subheader("🎒 Nộp bài học sinh")
     name = st.text_input("Tên học sinh")
     ans = st.text_area("Bài làm")
     if st.button("📩 Nộp bài"):
         st.success("✅ Đã nộp bài — GV sẽ chấm trên bản chính")
 
-# ----------------- INTRO -----------------
-
-else:
-    st.write("🧠 Hệ thống AI dạy học 5.0 – Bản nâng cấp V2")
-    # https://github.com/hqintel2020bv/ai-lophoc-toan-5-0
-
-def tao_de_thi(chude):
-    prompt = f"""
-    Tạo đề Toán THPT chủ đề: {chude}
-    - 5 câu trắc nghiệm (kèm đáp án)
-    - 2 câu tự luận (có hướng dẫn giải)
-    - Định dạng rõ ràng, dễ đọc
-    """
-    return prompt
-
-
-    resp = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=[{"role":"user","content":prompt}]
-    )
-    return resp.choices[0].message.content
-elif menu == "🧠 Tạo đề thi":
-    st.header("🧠 Tạo đề thi Toán")
+# Tạo đề thi AI
+elif menu_clean == "Tạo đề thi":
+    st.subheader("🧠 Tạo đề thi Toán")
     chude = st.text_input("Nhập chủ đề (VD: phương trình, hình học, đạo hàm...):")
-
     if st.button("Tạo đề ✅"):
         if chude.strip() == "":
             st.warning("Nhập chủ đề trước đã thầy ơi!")
@@ -172,10 +172,14 @@ elif menu == "🧠 Tạo đề thi":
             with st.spinner("Đang tạo đề..."):
                 de = tao_de_thi(chude)
                 st.write(de)
-
-                # Tải file
                 st.download_button(
                     "📥 Tải file đề",
                     de,
                     file_name=f"de_toan_{chude}.txt"
                 )
+
+# Giới thiệu
+else:
+    st.subheader("ℹ️ Giới thiệu")
+    st.write("🧠 Hệ thống AI dạy học 5.0 – Bản nâng cấp V2")
+    st.info("✅ Chấm bài — ✅ Tạo đề — ✅ Soạn bài")
