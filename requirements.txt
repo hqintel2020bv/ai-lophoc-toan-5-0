@@ -4,3 +4,4 @@ openai
 Pillow
 pytesseract
 python-dotenv
+pandas
