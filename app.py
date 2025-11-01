@@ -142,9 +142,11 @@ elif menu == "🎒 Nộp bài học sinh":
 
 # ----------------- INTRO -----------------
 else:
-    st.write("🧠 Hệ thống AI dạy học 5.0 — Bản nâng cấp V2")
-# https://github.com/hqintel2020bv/ai-lophoc-toan-5-0
+    st.write("🧠 Hệ thống AI dạy học 5.0 – Bản nâng cấp V2")
+    # https://github.com/hqintel2020bv/ai-lophoc-toan-5-0
+
 def tao_de_thi(chude):
+
     prompt = f"""
     Tạo đề Toán THPT chủ đề: {chude}
     - 5 câu trắc nghiệm (có đáp án)
