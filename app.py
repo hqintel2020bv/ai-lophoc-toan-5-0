@@ -157,3 +157,21 @@ def tao_de_thi(chude):
         messages=[{"role":"user","content":prompt}]
     )
     return resp.choices[0].message.content
+elif menu == "🧠 Tạo đề thi":
+    st.header("🧠 Tạo đề thi Toán")
+    chude = st.text_input("Nhập chủ đề (VD: phương trình, hình học, đạo hàm...):")
+
+    if st.button("Tạo đề ✅"):
+        if chude.strip() == "":
+            st.warning("Nhập chủ đề trước đã thầy ơi!")
+        else:
+            with st.spinner("Đang tạo đề..."):
+                de = tao_de_thi(chude)
+                st.write(de)
+
+                # Tải file
+                st.download_button(
+                    "📥 Tải file đề",
+                    de,
+                    file_name=f"de_toan_{chude}.txt"
+                )
