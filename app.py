@@ -141,18 +141,20 @@ elif menu == "🎒 Nộp bài học sinh":
         st.success("✅ Đã nộp bài — GV sẽ chấm trên bản chính")
 
 # ----------------- INTRO -----------------
+
 else:
     st.write("🧠 Hệ thống AI dạy học 5.0 – Bản nâng cấp V2")
     # https://github.com/hqintel2020bv/ai-lophoc-toan-5-0
 
 def tao_de_thi(chude):
-
     prompt = f"""
     Tạo đề Toán THPT chủ đề: {chude}
-    - 5 câu trắc nghiệm (có đáp án)
+    - 5 câu trắc nghiệm (kèm đáp án)
     - 2 câu tự luận (có hướng dẫn giải)
     - Định dạng rõ ràng, dễ đọc
     """
+    return prompt
+
 
     resp = client.chat.completions.create(
         model="gpt-4.1-mini",
